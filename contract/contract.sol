@@ -127,6 +127,10 @@ contract Dbms {
         emit UserDeleted(_id);
     }
 
+    function viewUser(uint256 _id) public view returns (User memory){
+        return users[_id];
+    }
+
     function userExists(User memory _user) private pure returns (bool) {
         return _user.id > 0;
     }
