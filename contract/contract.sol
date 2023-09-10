@@ -99,12 +99,17 @@ contract Dbms {
 
 
     function createUser(string memory _name, uint256 _age) public {
+        require(bytes(_name).length > 0, "Name cannot be empty");
+        require(_age > 0 && _age <= 150, "Invalid age value");
+
         userCount++;
         users[userCount] = User(userCount, _name, _age, false);
         emit UserCreated(userCount, _name, _age);
     }
 
     function updateUser(uint256 _id, string memory _name, uint256 _age) public {
+        require(bytes(_name).length > 0, "Name cannot be empty");
+        require(_age > 0, "Age must be greater than zero");
         User storage user = users[_id];
         require(userExists(user), "User does not exist");
         user.name = _name;
@@ -114,7 +119,7 @@ contract Dbms {
 
     function completeRegistration(uint256 _id) public {
         User storage user = users[_id];
-        require(userExists(user), "User does not exist");
+        require(!user.registered, "User is already registered");
         user.registered = true;
         emit UserRegistered(_id, true);
     }
@@ -128,10 +133,11 @@ contract Dbms {
     }
 
     function viewUser(uint256 _id) public view returns (User memory){
+        require(_id > 0 && _id <= userCount, "Invalid user ID");
         return users[_id];
     }
 
-    function userExists(User memory _user) private pure returns (bool) {
+    function userExists(User memory _user) public pure returns (bool) {
         return _user.id > 0;
     }
 }
