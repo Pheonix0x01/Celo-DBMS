@@ -1,168 +1,240 @@
 import Web3 from "web3";
-import { ContractKit } from "@celo/contractkit";
 import { newKitFromWeb3 } from "@celo/contractkit";
-import BigNumber from "bignumber.js";
 import contractAbi from "../contract/contract.abi.json";
 import erc20Abi from "../contract/erc20.abi.json";
 
-
 const ERC20_DECIMALS = 18;
-const ContractAddress = "0xb74e1c04E449306FF0df8fE924E777C3f56e34e0";
-const cUSDContractAddress = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1";
+const CONTRACT_ADDRESS = "0x002f18401DFdB08CE6355BDbcd6A49C02Be905A3";
+const CUSD_CONTRACT_ADDRESS = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1";
 
 let kit;
 let contract;
-let users = [];
 
 const connectCeloWallet = async function () {
-    if (window.celo) {
-        notification("Approve the Celo DBMS...")
-        try {
+    if (window.celo){
+        displayNotification("Approve the CELO DBMS to use it!");
+        try{
             await window.celo.enable();
-            notification("Celo Wallet Connected");
-            setTimeout(notificationOff, 3000); // 3 second delay before turning of the notification
+            notificationOff();
+
             const web3 = new Web3(window.celo);
             kit = newKitFromWeb3(web3);
+
             const accounts = await kit.web3.eth.getAccounts();
             kit.defaultAccount = accounts[0];
 
             contract = new kit.web3.eth.Contract(
                 contractAbi,
-                ContractAddress
+                CONTRACT_ADDRESS
             );
-            getBalance();
-        } catch (error) {
-            notification(`${error}.`);
+        } catch (error){
+            displayNotification(`${error}.`);
         }
-    } else {
-        notification("Install the celo extension wallet to use this DApp!!!");
+    } else{
+        displayNotification("Please install the Celo Wallet Extension!");
     }
 };
 
 const getBalance = async function () {
+    if (!kit){
+        console.error("ContractKit is not initialized yet. Call connectCeloWallet() first!");
+        return;
+    }
+    try{
+        const totalBalance = await kit.getTotalBalance(kit.defaultAccount);
+        const cUSDBalance = totalBalance.cUSD.shiftedBy(-ERC20_DECIMALS).toFixed(2);
+        document.querySelector("#balance").textContent = cUSDBalance;
+    }
+    catch (error){
+        console.error(error);
+    }
+}
+
+
+/* function notification(_text) {
+	document.querySelector(".alert").style.display = "block";
+	document.querySelector("#notification").textContent = _text;
+} */
+
+function notificationOff() {
+	document.querySelector(".alert").style.display = "none";
+}
+
+function displayNotification(_text, isError=false){
+    const notification = document.getElementById("notification");
+    notification.textContent = _text;
+    notification.style.color = isError ? "red" : "green";
+}
+
+const createUser = async (name, age) => {
     if (!kit) {
-        console.error("Celo wallet is not connected.");
+        console.error("ContractKit is not initialized yet. Call connectCeloWallet() first!");
         return;
     }
 
     try {
-        const totalBalance = await kit.getTotalBalance(kit.defaultAccount);
-        const cUSDBalance = totalBalance.cUSD.shiftedBy(-ERC20_DECIMALS).toFixed(2);
-        document.querySelector("#balance").textContent = cUSDBalance;
-    } catch (error) {
-        console.error("Error getting balance:", error);
-    }
-};
+        const accounts = await kit.web3.eth.getAccounts();
+        kit.defaultAccount = accounts[0];
 
-function notification(_text){
-    document.querySelector(".alert").style.display = "block";
-    document.querySelector("#notification").textContent = _text;
-}
-
-function notificationOff(){
-    document.querySelector(".alert").style.display = "none";
-}
-
-const getUsers = async function(){
-    const _numberOfUsers = await contract.methods
-            .userCount()
-            .call();
-
-    const _users = [];
-    
-    for (let i=0; i<_numberOfUsers; i++){
-        let _user = new Promise(async(resolve, reject) =>{
-            let p = await contract.methods.viewUser(i).call;
-            resolve({
-                index: i,
-                name: p[0],
-                age: p[1],
-                registered: p[2],
-
-            });
+        const contract = new kit.web3.eth.Contract(contractAbi, CONTRACT_ADDRESS);
+        const gas = await contract.methods.createUser(name, age).estimateGas();
+        const tx = await contract.methods.createUser(name, age).send({
+            from: kit.defaultAccount,
+            gas,
         });
-        _users.push(_user);
+
+        console.log("Transaction receipt:", tx);
+
+        // Refresh the user list after creating a new user
+        await displayUsers();
+    } catch (error) {
+        console.error(error);
     }
-    users = await Promise.all(_users);
-    renderUsers();
 };
 
-function renderUsers(){
-    document.getElementById("userList").innerHTML = "";
-    users.forEach((_user) => {
-        const row = document.createElement("tr");
+// Function to handle the form submission
+const handleCreateUserForm = async (event) => {
+    event.preventDefault();
+    const name = document.getElementById("name").value;
+    const age = parseInt(document.getElementById("age").value);
 
-        const nameCell = document.createElement("td");
-        nameCell.textContent = _user.name;
-
-        const ageCell = document.createElement("td");
-        ageCell.textContent = _user.age;
-
-        row.appendChild(nameCell);
-        row.appendChild(ageCell);
-
-        tableBody.appendChild(row);
-    });
-}
-
-async function approve(){
-    const cUSDContract = new kit.web3.eth.Contract(
-            erc20Abi,
-            cUSDContractAddress
-    );
-
-    const result = await cUSDContract.methods
-            .approve(ContractAddress)
-            .send({ from: kit.defaultAccount });
-    return result;        
-}
-
-document.querySelector("#submitBtn").addEventListener("click", async (e) => {
-    const params = [
-        document.getElementById("name").value,
-        document.getElementById("age").value,
-
-    ];
-    notification(`Adding "${params[0]}"...`);
-    try{
-        await contract.methods
-            .createUser(...params)
-            .send({ from: kit.defaultAccount }); 
-                                            
-    notification(`MADE IT HERE`) ;                              
-    } catch (error){
-        notification(`${error}.`);
+    if (name && !isNaN(age)) {
+        await createUser(name, age);
+        document.getElementById("createUserForm").reset();
+    } else {
+        displayNotification("Please provide a valid name and age.", true);
     }
-    setTimeout(() => {
-        notification(`"${params[0]}", successfully added to the database`);
-    }, 1000);
+};
 
-    setTimeout(() => {
-        notificationOff();
-    }, 2000)
-    redirectToUserList("../public/userList.html");
+// Add an event listener to the "createUserButton" button
+document.getElementById("createUserButton").addEventListener("click", handleCreateUserForm);
+
+// Function to update a user
+const updateUser = async (id) => {
+    if (!kit) {
+        console.error("ContractKit is not initialized yet. Call connectCeloWallet() first!");
+        return;
+    }
+
+    try {
+        const accounts = await kit.web3.eth.getAccounts();
+        kit.defaultAccount = accounts[0];
+
+        const contract = new kit.web3.eth.Contract(contractAbi, CONTRACT_ADDRESS);
+        const gas = await contract.methods.updateUser(id, name, age).estimateGas();
+        const tx = await contract.methods.updateUser(id, name, age).send({
+            from: kit.defaultAccount,
+            gas,
+        });
+
+        console.log("Transaction receipt:", tx);
+
+        // Refresh the user list after updating a user
+        await displayUsers();
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+// Function to delete a user
+const deleteUser = async (id) => {
+    if (!kit) {
+        console.error("ContractKit is not initialized yet. Call connectCeloWallet() first!");
+        return;
+    }
+
+    try {
+        const accounts = await kit.web3.eth.getAccounts();
+        kit.defaultAccount = accounts[0];
+
+        const contract = new kit.web3.eth.Contract(contractAbi, CONTRACT_ADDRESS);
+        const gas = await contract.methods.deleteUser(id).estimateGas();
+        const tx = await contract.methods.deleteUser(id).send({
+            from: kit.defaultAccount,
+            gas,
+        });
+
+        console.log("Transaction receipt:", tx);
+
+        // Refresh the user list after deleting a user
+        await displayUsers();
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+// Function to display users
+const displayUsers = async () => {
+    if (!kit) {
+        console.error("ContractKit is not initialized yet. Call connectCeloWallet() first!");
+        return;
+    }
+
+    try {
+        const accounts = await kit.web3.eth.getAccounts();
+        kit.defaultAccount = accounts[0];
+
+        const contract = new kit.web3.eth.Contract(contractAbi, CONTRACT_ADDRESS);
+        const userCount = await contract.methods.userCount().call();
+
+        const userTableBody = document.getElementById("userTableBody");
+        userTableBody.innerHTML = ""; // Clear existing table rows
+
+        for (let i = 1; i <= userCount; i++) {
+            const user = await contract.methods.viewUser(i).call();
+            const row = userTableBody.insertRow();
+            row.insertCell(0).textContent = user.id;
+            row.insertCell(1).textContent = user.name;
+            row.insertCell(2).textContent = user.age;
+            row.insertCell(3).textContent = user.registered ? "Yes" : "No";
+
+            // Add update and delete buttons to each row
+            const actionsCell = row.insertCell(4);
+            const updateButton = document.createElement("button");
+            updateButton.textContent = "Update";
+            updateButton.classList.add("update-button");
+            actionsCell.appendChild(updateButton);
+
+            const deleteButton = document.createElement("button");
+            deleteButton.textContent = "Delete";
+            deleteButton.classList.add("delete-button");
+            actionsCell.appendChild(deleteButton);
+        }
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+
+
+// Add an event listener to the table for update and delete buttons
+document.getElementById("userTableBody").addEventListener("click", async (event) => {
+    const target = event.target;
+    if (target.classList.contains("update-button")) {
+        const row = target.parentElement.parentElement;
+        const id = parseInt(row.cells[0].textContent);
+
+        // Prompt for new name and age
+        const newName = prompt("Enter the new name:");
+        const newAge = parseInt(prompt("Enter the new age:"));
+
+        if (newName !== null && !isNaN(newAge)) {
+            await updateUser(id, newName, newAge);
+        }
+    } else if (target.classList.contains("delete-button")) {
+        if (confirm("Are you sure you want to delete this user?")) {
+            const row = target.parentElement.parentElement;
+            const id = parseInt(row.cells[0].textContent);
+            await deleteUser(id);
+        }
+    }
 });
 
-document.querySelector("#backToList").addEventListener("click", async (e) =>{
-    try{
-        redirectToUserList("../publicuserList.html");
-    } catch(error){
-        notification(`${error}`);
-    }
-})
-
-function redirectToUserList(){
-    window.location.href = url;
-}
-
-
-// function getUserList(){
-    
-// }
-
-
-
+// Call the displayUsers function once when the page loads
 window.addEventListener("load", async () => {
+    displayNotification("Loading...");
     await connectCeloWallet();
-    await getBalance();
+    await displayUsers(); // Call the function to populate the table
+    getBalance(); // Call the function to get the balance
+    notificationOff(); // Turn off the loading notification
 });

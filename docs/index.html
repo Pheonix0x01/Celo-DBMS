@@ -2,12 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registration Form</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css">
+    <!-- CSS -->
     <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css"
     rel="stylesheet"
@@ -15,110 +11,143 @@
     crossorigin="anonymous"
     />
     <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.0/font/bootstrap-icons.css"
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.0/font/bootstrap-icons.css"
     />
     <link rel="preconnect" href="https://fonts.gstatic.com" />
     <link
-        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap"
-        rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap"
+    rel="stylesheet"
     />
-    
-    <style>
 
-        .registration-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+    <title>Celo User Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .form-button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .form-button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
         }
     </style>
-
     <style>
-        @media (min-width: 1025px) {
-    .h-custom {
-    height: 100vh !important;
-    }
-    }
-    </style> 
-      
+     .alert-warning {
+    color: #664d03;
+    background-color: greenyellow;
+    border-color: greenyellow !important
+     }
+    </style>
 </head>
+<body>
+    <div class="container">
+        <h1>Celo User Management</h1>
 
-<section class="h-100 h-custom" style="background-color: #8fc4b7;">
-    <div class="container py-5 h-100">
-      <div class="row d-flex justify-content-center align-items-center h-100">
-        <div class="col-lg-8 col-xl-6">
-          <div class="card rounded-3">
-            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-registration/img3.webp"
-              class="w-100" style="border-top-left-radius: .3rem; border-top-right-radius: .3rem;"
-              alt="Sample photo">
-            <div class="card-body p-4 p-md-5">
-                <div class="registration-header d-flex align-items-center">
-                    <h3 class="mb-4 pb-2 pb-md-0 mb-md-5 px-md-2">Registration Info</h3>
-                    <span class="border rounded-pill bg-light">
-                        <span id="balance" class="text-center">0
-                        </span>
-                        cUSD
-                    </span>
-
-                </div>
-                <div class="alert alert-warning sticky-top mt-2" role="alert">
-                    <span id="notification"></span>
-                </div>
-
-              
-              <form class="px-md-2" autocomplete="off">
-            
-                <div class="form-outline mb-4">
-                    <input
-                        type="text"
-                        id="name"
-                        class="form-control mb-2"
-                        placeholder="Enter your name"
-                    />
-                </div>
-                <div class="form-outline mb-4">
-                    <input
-                        type="text"
-                        id="age"
-                        class="form-control mb-2"
-                        placeholder="Enter your age"
-                    />
-                </div>
-                <div class="row">
-                    <div class="col-md-7">
-                        <button id="submitBtn" type="submit" class="btn btn-success btn-block btn-lg"><i class="fa-light fa-share-from-square"></i>Submit</button>
-                    </div>
-                    <div class="col-md-5">
-                        <a href="userList.html" id="backToList"  class="btn btn-secondary btn-block btn-lg">
-                            <i class="fas fa-stream"></i>Go to List
-                        </a>
-                    </div>
-                </div>
-                
-            
-                
-            </form>
+        <!-- Create User Section -->
+        <div class="form-section">
+            <span class="center">
+                <h2>Create a New User</h2>
+            </span>
+            <span class="border rounded-pill bg-light">
+                <span id="balance" class="text-center">0</span>
+                cUSD
+            </span>
+            <div class="alert alert-warning sticky-top mt-2" role="alert">
+                <span id="notification" style="color: red"></span>
             </div>
+            
+            
+            <form id="createUserForm">
+                <label for="name" class="form-label">Name:</label>
+                <input type="text" id="name" class="form-input" required>
+                <label for="age" class="form-label">Age:</label>
+                <input type="number" id="age" class="form-input" required>
+                <button id="createUserButton" type="submit" class="form-button">Create User</button>
+            </form>
         </div>
-      </div>
-    </div>
-  </div>
-</section>
 
-    <!-- <script src="vendor/web3/dist/web3.js"></script> -->
-    <script src="main.js"></script> 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-        crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" 
-    integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" 
-    crossorigin="anonymous"></script>
-     
-<script type="text/javascript" src="main.js"></script></body>
+        <!-- Display Users Section -->
+        <div>
+            <h2>Registered Users</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Registered</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <!-- User data will be displayed here dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
 </html>
