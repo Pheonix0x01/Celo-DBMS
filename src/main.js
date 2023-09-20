@@ -4,7 +4,7 @@ import contractAbi from "../contract/contract.abi.json";
 import erc20Abi from "../contract/erc20.abi.json";
 
 const ERC20_DECIMALS = 18;
-const CONTRACT_ADDRESS = "0x002f18401DFdB08CE6355BDbcd6A49C02Be905A3";
+const CONTRACT_ADDRESS = "0x681A31e0FE35F1B9ae369C0eaD5927e8843233f8";
 const CUSD_CONTRACT_ADDRESS = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1";
 
 let kit;
