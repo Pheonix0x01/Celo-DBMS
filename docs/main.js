@@ -4,15 +4,15 @@ import contractAbi from "../contract/contract.abi.json";
 import erc20Abi from "../contract/erc20.abi.json";
 
 const ERC20_DECIMALS = 18;
-const CONTRACT_ADDRESS = "0x681A31e0FE35F1B9ae369C0eaD5927e8843233f8";
+const CONTRACT_ADDRESS = "0x415b81326e070521459578D5240C95B5C3De2941";
 const CUSD_CONTRACT_ADDRESS = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1";
 
 let kit;
 let contract;
 
-const connectCeloWallet = async function () {
+const connectCeloWallet = async function () { // function to connect the celo extension wallet to the DApp
     if (window.celo){
-        displayNotification("Approve the CELO DBMS to use it!");
+        displayNotification("Approve the CELO DBMS to use it!"); // if the extension wallet has been installed but not approved yet.
         try{
             await window.celo.enable();
             notificationOff();
@@ -35,7 +35,7 @@ const connectCeloWallet = async function () {
     }
 };
 
-const getBalance = async function () {
+const getBalance = async function () { // function to get and display balance of the connected wallet
     if (!kit){
         console.error("ContractKit is not initialized yet. Call connectCeloWallet() first!");
         return;
@@ -43,7 +43,7 @@ const getBalance = async function () {
     try{
         const totalBalance = await kit.getTotalBalance(kit.defaultAccount);
         const cUSDBalance = totalBalance.cUSD.shiftedBy(-ERC20_DECIMALS).toFixed(2);
-        document.querySelector("#balance").textContent = cUSDBalance;
+        document.querySelector("#balance").textContent = cUSDBalance; // from the balance id in the html file
     }
     catch (error){
         console.error(error);
@@ -56,7 +56,7 @@ const getBalance = async function () {
 	document.querySelector("#notification").textContent = _text;
 } */
 
-function notificationOff() {
+function notificationOff() { // function to turn off notification when not in use
 	document.querySelector(".alert").style.display = "none";
 }
 
@@ -206,15 +206,15 @@ const displayUsers = async () => {
 };
 
 
-
-// Add an event listener to the table for update and delete buttons
+// Add an event listener to the table for update and delete buttons (using event delegation)
 document.getElementById("userTableBody").addEventListener("click", async (event) => {
     const target = event.target;
     if (target.classList.contains("update-button")) {
+        event.preventDefault(); // Prevent the default button click behavior
+
         const row = target.parentElement.parentElement;
         const id = parseInt(row.cells[0].textContent);
 
-        // Prompt for new name and age
         const newName = prompt("Enter the new name:");
         const newAge = parseInt(prompt("Enter the new age:"));
 
@@ -222,6 +222,8 @@ document.getElementById("userTableBody").addEventListener("click", async (event)
             await updateUser(id, newName, newAge);
         }
     } else if (target.classList.contains("delete-button")) {
+        event.preventDefault(); // Prevent the default button click behavior
+
         if (confirm("Are you sure you want to delete this user?")) {
             const row = target.parentElement.parentElement;
             const id = parseInt(row.cells[0].textContent);
@@ -229,6 +231,8 @@ document.getElementById("userTableBody").addEventListener("click", async (event)
         }
     }
 });
+
+
 
 // Call the displayUsers function once when the page loads
 window.addEventListener("load", async () => {
