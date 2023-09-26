@@ -17,4 +17,4 @@ Read User: Details of a user can be read
 Contributions are welcome
 
 **Deployment**
-It is live at https://pheonix0x01.github.io/Celo-DBMS/
+It is live at https://pheonix0x01.github.io/Celo-Management-System/
