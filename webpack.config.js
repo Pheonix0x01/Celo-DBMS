@@ -6,6 +6,9 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 module.exports = {
   mode: "development",
   devtool: "cheap-module-eval-source-map",
+  devServer: {
+     allowedHosts: "all"
+  },	
   entry: {
     main: path.resolve(process.cwd(), "src", "main.js")
   },
