@@ -66,22 +66,30 @@ interface IERC20Token {
 
 contract Dbms {
 
-    address private cUsdTokenAddress = 0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1;
+    address private cUsdTokenAddress = 0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1; // cusd address
         
     struct User {
         uint256 id;
         string name;
         uint256 age;
-        bool registered;
+        bool registered; // initialized to False. To be set to truw when the user has been confirmed.
     }
 
     uint256 public userCount;
     mapping(uint256 => User) public users;
+    mapping(uint256 => address) private userCreators;
 
     event UserCreated(uint256 id, string name, uint256 age); // To create user
     event UserUpdated(uint256 id, string name, uint256 age); // To update user
     event UserRegistered(uint256 id, bool registered); // To make sure user is registered
     event UserDeleted(uint256 id); // To delete user
+
+
+    modifier onlyUserCreator(uint256 _id) {
+        require(msg.sender == userCreators[_id], "Only the creator can perform this action");
+    _;
+    }
+
 
 
     // function parseInt(string memory _value) internal pure returns (uint256) {
@@ -99,27 +107,29 @@ contract Dbms {
 
 
     function createUser(string memory _name, uint256 _age) public {
-        userCount++;
+        userCount++; // increase count for number of users
         users[userCount] = User(userCount, _name, _age, false);
+        userCreators[userCount] = msg.sender; // to store the creators address
         emit UserCreated(userCount, _name, _age);
     }
 
-    function updateUser(uint256 _id, string memory _name, uint256 _age) public {
+    function updateUser(uint256 _id, string memory _name, uint256 _age) public onlyUserCreator(_id) { // update user function. only the creator of this user can update it
+
         User storage user = users[_id];
-        require(userExists(user), "User does not exist");
+        require(userExists(user), "User does not exist"); // check for if the user of that id exists
         user.name = _name;
         user.age = _age;
         emit UserUpdated(_id, _name, _age);
     }
 
-    function completeRegistration(uint256 _id) public {
+    function completeRegistration(uint256 _id) public { // function to chek if the user has been fully registered.
         User storage user = users[_id];
         require(userExists(user), "User does not exist");
         user.registered = true;
         emit UserRegistered(_id, true);
     }
 
-    function deleteUser(uint256 _id) public {
+    function deleteUser(uint256 _id) public onlyUserCreator(_id) { // delete user function, only the creator of this user can delete
         User storage user = users[_id];
         require(userExists(user), "User does not exist");
         delete users[_id];
