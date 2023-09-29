@@ -1,7 +1,7 @@
 let path = require("path");
 let webpack = require("webpack");
 let webpackDevServer = require("webpack-dev-server");
-let webpackConfig = require("./webpack.config");
+let webpackConfig = require("webpack.config");
 
 let webpackDevServerOptions = {
   publicPath: "/",
