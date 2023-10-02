@@ -3,10 +3,6 @@ const webpack = require("webpack");
 const FriendlyErrorsWebpackPlugin = require("friendly-errors-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
-devServer: {
-     allowedHosts: "all"
-}
-
 module.exports = {
   mode: "development",
   devtool: "cheap-module-eval-source-map",	
