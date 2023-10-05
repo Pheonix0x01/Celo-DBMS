@@ -1,11 +1,11 @@
-let path = require("path");
-let webpack = require("webpack");
+import { join } from "path";
+import webpack from "webpack";
 let webpackDevServer = require("webpack-dev-server");
-let webpackConfig = require("webpack.config.js");
+import webpackConfig from "webpack.config.js";
 
 let webpackDevServerOptions = {
   publicPath: "/",
-  contentBase: path.join(process.cwd(), "dist"),
+  contentBase: join(process.cwd(), "dist"),
   historyApiFallback: true,
   hot: true,
   host: "0.0.0.0"
